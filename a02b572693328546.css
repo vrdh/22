@@ -1,0 +1,187 @@
+body {
+    background-color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: auto;
+    padding: 0;
+    font-size: 12px;
+    max-width: 100%
+}
+
+.l {
+    width: 100%;
+    height: auto
+}
+
+.hi {
+    font-weight: 700;
+    font-size: 12px
+}
+
+.hi,
+a {
+    color: #673391
+}
+
+a {
+    text-decoration: none
+}
+
+header {
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc
+}
+
+.logo,
+header img {
+    width: 200px;
+    height: auto
+}
+
+footer {
+    margin-top: 20px
+}
+
+footer img {
+    width: 100%;
+    height: auto
+}
+
+form {
+    margin: 20px;
+    border: 1px solid #673391;
+    padding: 25px;
+    border-radius: 10px
+}
+
+.floating-container {
+    margin-top: 25px;
+    position: relative;
+    width: 100%;
+    font-size: 16px
+}
+
+.floating-container input::placeholder {
+    font-size: 16px;
+    color: #aaa
+}
+
+.topL {
+    text-align: center
+}
+
+.topL img {
+    max-width: 50%;
+    height: auto
+}
+
+.floating-container input {
+    width: 100%;
+    padding: 8px 0;
+    font-size: 16px;
+    border: none;
+    border-bottom: 1px solid #d2d2d2;
+    outline: none;
+    background-color: transparent
+}
+
+h1 {
+    font-weight: 600;
+    font-size: 24px;
+    margin-bottom: 5px;
+    margin-top: 5px
+}
+
+.tagline {
+    color: #280071;
+    font-size: 14px;
+    text-align: center
+}
+
+.floating-container input:focus {
+    border-bottom: 1px solid #673391
+}
+
+.floating-container label {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #777;
+    transition: all .3s ease;
+    pointer-events: none;
+    font-weight: 400
+}
+
+.floating-container input:focus+label,
+.floating-container input:not(:placeholder-shown)+label {
+    top: -8px;
+    font-size: 16px;
+    color: #777
+}
+
+label span {
+    color: red
+}
+
+.cpa {
+    padding: 2px 0
+}
+
+.cpa img {
+    max-width: 60%
+}
+
+.btContainer {
+    text-align: center;
+    margin-top: 20px
+}
+
+.btContainer button {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #673391;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer
+}
+
+.btContainer button:hover {
+    background-color: #673391cb
+}
+
+.spinner-container {
+    flex-direction: column;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: #f0f0f0
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 5px solid #c9c9c9;
+    border-top-color: #673391;
+    border-radius: 50%;
+    animation: spin 1s linear infinite
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg)
+    }
+
+    to {
+        transform: rotate(1turn)
+    }
+}
+
+.spinner-container p {
+    font-weight: 700
+}

